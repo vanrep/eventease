@@ -21,11 +21,10 @@ public class EventoService {
     private final EventoRepository eventoRepository;
     private final UsuarioRepository usuarioRepository;
 
-    // crear evento
-    public EventoDto crearEvento(EventoDto dto) {
+    public EventoDto crearEvento(EventoDto dto, String email) {
 
-        // buscar cliente por id
-        Optional<Usuario> opt = usuarioRepository.findById(dto.getClienteId());
+        // buscar cliente por email (del token)
+        Optional<Usuario> opt = usuarioRepository.findByEmail(email);
 
         if (opt.isEmpty()) {
             throw new RecursoNoEncontradoException("Usuario no encontrado");
@@ -55,6 +54,54 @@ public class EventoService {
             eventosDto.add(entityToDto(e));
         }
         return eventosDto;
+    }
+
+    // obtener evento por id
+    public EventoDto obtenerPorId(Long id) {
+        Optional<Evento> opt = eventoRepository.findById(id);
+        if (opt.isEmpty()) {
+            throw new RecursoNoEncontradoException("Evento no encontrado");
+        }
+        return entityToDto(opt.get());
+    }
+
+    // actualizar evento
+    public EventoDto actualizarEvento(Long id, EventoDto dto, String email) {
+        Optional<Evento> opt = eventoRepository.findById(id);
+        if (opt.isEmpty()) {
+            throw new RecursoNoEncontradoException("Evento no encontrado");
+        }
+        
+        Evento e = opt.get();
+        // Verificar que el usuario autenticado sea el dueño
+        if (!e.getCliente().getEmail().equals(email)) {
+            throw new eventease.Exception.NoAutorizadoException("No tienes permiso para editar este evento");
+        }
+
+        e.setTitulo(dto.getTitulo());
+        e.setDescripcion(dto.getDescripcion());
+        e.setFecha(dto.getFecha());
+        e.setUbicacion(dto.getUbicacion());
+        e.setCapacidad(dto.getCapacidad());
+
+        Evento guardado = eventoRepository.save(e);
+        return entityToDto(guardado);
+    }
+
+    // eliminar evento
+    public void eliminarEvento(Long id, String email) {
+        Optional<Evento> opt = eventoRepository.findById(id);
+        if (opt.isEmpty()) {
+            throw new RecursoNoEncontradoException("Evento no encontrado");
+        }
+
+        Evento e = opt.get();
+        // Verificar que el usuario autenticado sea el dueño
+        if (!e.getCliente().getEmail().equals(email)) {
+            throw new eventease.Exception.NoAutorizadoException("No tienes permiso para eliminar este evento");
+        }
+
+        eventoRepository.delete(e);
     }
 
     // convertir entidad a dto

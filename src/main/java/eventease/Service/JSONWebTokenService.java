@@ -13,7 +13,7 @@ import io.jsonwebtoken.security.Keys;
 public class JSONWebTokenService {
     
     // clave secreta 
-    private final String SECRET = "paella_valenciana";
+    private final String SECRET = "mi_clave_super_secreta_para_eventease_2026_con_mas_de_32_caracteres";
 
     // generar token
     public String generateToken(String email) {
@@ -24,7 +24,6 @@ public class JSONWebTokenService {
                 .signWith(getKey()) // firma el token
                 .compact();
     }
-
     // extraer email del token
     public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();

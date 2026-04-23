@@ -4,6 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import eventease.Dto.UsuarioDto;
+import eventease.Exception.ConflictException;
 import eventease.Model.Usuario;
 import eventease.Repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,11 +19,11 @@ public class UsuarioService {
     public UsuarioDto registrarUsuario(UsuarioDto dto) {
 
          if (usuarioRepository.existsByEmail(dto.getEmail())) {
-            throw new RuntimeException("El email ya está registrado");
+            throw new ConflictException("El email ya está registrado");
         }
 
         if (usuarioRepository.existsByDni(dto.getDni())) {
-            throw new RuntimeException("El DNI ya está registrado");
+            throw new ConflictException("El DNI ya está registrado");
         }
 
         Usuario u = new Usuario();
