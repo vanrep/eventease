@@ -49,7 +49,7 @@ public class Usuario {
     @OneToMany(mappedBy = "cliente")
     private List<Evento> eventosCreados = new ArrayList<>();
 
-    @OneToMany(mappedBy = "asistente")
+    @OneToMany(mappedBy = "emailAsistente")
     private List<Invitacion> invitaciones = new ArrayList<>();
 
 }

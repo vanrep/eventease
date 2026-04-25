@@ -36,6 +36,5 @@ public class EventoDto {
     @Min(value = 1, message = "La capacidad debe ser al menos 1")
     private Integer capacidad;
 
-    @NotNull(message = "El id del cliente es obligatorio")
     private Long clienteId;
 }

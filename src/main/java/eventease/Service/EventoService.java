@@ -7,10 +7,12 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import eventease.Dto.EventoDto;
+import eventease.Exception.NoAutorizadoException;
 import eventease.Exception.RecursoNoEncontradoException;
 import eventease.Model.Evento;
 import eventease.Model.Usuario;
 import eventease.Repository.EventoRepository;
+import eventease.Repository.InvitacionRepository;
 import eventease.Repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -20,6 +22,7 @@ public class EventoService {
 
     private final EventoRepository eventoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final InvitacionRepository invitacionRepository;
 
     public EventoDto crearEvento(EventoDto dto, String email) {
 
@@ -57,11 +60,21 @@ public class EventoService {
     }
 
     // obtener evento por id
-    public EventoDto obtenerPorId(Long id) {
+    public EventoDto obtenerPorId(Long id, String email) {
         Optional<Evento> opt = eventoRepository.findById(id);
         if (opt.isEmpty()) {
             throw new RecursoNoEncontradoException("Evento no encontrado");
         }
+
+        Evento evento = opt.get();
+        // Verificar que el usuario es el creador o está invitado
+        boolean esCreador = evento.getCliente().getEmail().equals(email);
+        boolean esInvitado = invitacionRepository.existsByEventoIdAndEmailAsistente(id, email);
+
+        if (!esCreador && !esInvitado) {
+            throw new NoAutorizadoException("No tienes permiso para ver este evento");
+        }
+
         return entityToDto(opt.get());
     }
 
@@ -71,7 +84,7 @@ public class EventoService {
         if (opt.isEmpty()) {
             throw new RecursoNoEncontradoException("Evento no encontrado");
         }
-        
+
         Evento e = opt.get();
         // Verificar que el usuario autenticado sea el dueño
         if (!e.getCliente().getEmail().equals(email)) {
@@ -113,6 +126,7 @@ public class EventoService {
         dto.setFecha(e.getFecha());
         dto.setUbicacion(e.getUbicacion());
         dto.setCapacidad(e.getCapacidad());
+        dto.setClienteId(e.getCliente().getId());
         dto.setClienteId(e.getCliente().getId());
         return dto;
     }

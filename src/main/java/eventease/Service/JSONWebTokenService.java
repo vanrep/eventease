@@ -3,6 +3,7 @@ package eventease.Service;
 import java.security.Key;
 import java.util.Date;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
@@ -11,19 +12,26 @@ import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JSONWebTokenService {
-    
-    // clave secreta 
-    private final String SECRET = "mi_clave_super_secreta_para_eventease_2026_con_mas_de_32_caracteres";
+
+    // clave secreta
+    @Value("${jwt.secret}")
+    private String secret;
+
+    // 1 hora, expiración del token
+    @Value("${jwt.expiration}")
+    private long expiration;
 
     // generar token
-    public String generateToken(String email) {
+    public String generateToken(String email, Long userId) {
         return Jwts.builder()
                 .setSubject(email) // guarda el email dentro del token
+                .claim("userId", userId) // guarda el ID numérico
                 .setIssuedAt(new Date()) // fecha de creación
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hora
+                .setExpiration(new Date(System.currentTimeMillis() + expiration)) // 1 hora
                 .signWith(getKey()) // firma el token
                 .compact();
     }
+
     // extraer email del token
     public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();
@@ -51,8 +59,7 @@ public class JSONWebTokenService {
 
     // generar clave
     private Key getKey() {
-        return Keys.hmacShaKeyFor(SECRET.getBytes());
+        return Keys.hmacShaKeyFor(secret.getBytes());
     }
-
 
 }

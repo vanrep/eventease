@@ -38,8 +38,8 @@ public class AuthService {
             throw new NoAutorizadoException("Contraseña incorrecta");
         }
 
-        // generar token
-        String token = jwtService.generateToken(usuario.getEmail());
+        // generar token con email e ID
+        String token = jwtService.generateToken(usuario.getEmail(), usuario.getId());
 
         return new AuthResponseDto(token);
     }

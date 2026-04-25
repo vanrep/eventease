@@ -2,6 +2,7 @@ package eventease.Config;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,12 +28,17 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // para poder usar AuthenticationManager
+    // Angular port
+    @Value("${cors.origin}")
+    private String corsOrigin;
+
+    // para poder usar AuthenticationManager para validar contraseñas
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
+    // para codificar contraseñas y compararlas (entre el login dto y bd)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -42,17 +48,20 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                 // activar cors
+                // activar cross-origin resource sharing para permitir peticiones desde otro
+                // puerto (4200 Angular)
                 .cors(cors -> {
                 })
 
-                // porque no se usan formularios de login de Spring
+                // CSRP desactivado porque no se usan formularios de login de Spring - se usa
+                // API stateless con JWT
                 .csrf(csrf -> csrf.disable())
 
-                // porque ya no se usan sesiones
+                // peticiones independientes
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+                // rutas públicas vs privadas
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/register", "/css/**", "/js/**").permitAll()
                         .anyRequest().authenticated())
@@ -69,7 +78,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // permitir peticiones desde Angular
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedOrigins(List.of(corsOrigin));
 
         // permitir métodos HTTP
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));

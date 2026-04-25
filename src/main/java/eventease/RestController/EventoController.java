@@ -47,8 +47,9 @@ public class EventoController {
 
     // obtener evento por id
     @GetMapping("/{id}")
-    public ResponseEntity<EventoDto> obtenerEvento(@PathVariable Long id) {
-        EventoDto evento = eventoService.obtenerPorId(id);
+    public ResponseEntity<EventoDto> obtenerEvento(@PathVariable Long id, Principal principal) {
+        String email = principal.getName();    //email del usuario autenticado
+        EventoDto evento = eventoService.obtenerPorId(id, email);
         return ResponseEntity.ok(evento);
     }
 
