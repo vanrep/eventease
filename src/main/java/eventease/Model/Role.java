@@ -1,5 +1,5 @@
 package eventease.Model;
 
 public enum Role {
-    CLIENTE, ASISTENTE, ADMIN
+    CLIENTE, ADMIN
 }

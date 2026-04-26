@@ -2,6 +2,7 @@ package eventease.Dto;
 
 import java.time.LocalDateTime;
 
+import eventease.Model.EstadoInvitacion;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -37,4 +38,6 @@ public class EventoDto {
     private Integer capacidad;
 
     private Long clienteId;
+    private String clienteEmail;
+    private EstadoInvitacion miEstadoInvitacion;
 }

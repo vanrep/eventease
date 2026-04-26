@@ -7,9 +7,13 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import eventease.Dto.EventoDto;
+import eventease.Dto.EventoDetallesDto;
+import eventease.Dto.InvitacionDto;
 import eventease.Exception.NoAutorizadoException;
 import eventease.Exception.RecursoNoEncontradoException;
+import eventease.Model.EstadoInvitacion;
 import eventease.Model.Evento;
+import eventease.Model.Invitacion;
 import eventease.Model.Usuario;
 import eventease.Repository.EventoRepository;
 import eventease.Repository.InvitacionRepository;
@@ -49,25 +53,42 @@ public class EventoService {
 
     // listar eventos por email (usuario logeado)
     public List<EventoDto> listarEventosPorEmail(String email) {
+        List<Evento> eventosPropios = eventoRepository.findByClienteEmail(email);
+        List<Invitacion> invitaciones = invitacionRepository.findByEmailAsistente(email);
 
-        List<Evento> eventos = eventoRepository.findByClienteEmail(email);
         List<EventoDto> eventosDto = new ArrayList<>();
 
-        for (Evento e : eventos) {
+        for (Evento e : eventosPropios) {
             eventosDto.add(entityToDto(e));
         }
+
+        for (Invitacion inv : invitaciones) {
+            Evento eventoInvitado = inv.getEvento();
+
+            boolean yaExiste = false;
+
+            for (EventoDto dto : eventosDto) {
+                if (dto.getId().equals(eventoInvitado.getId())) {
+                    yaExiste = true;
+                }
+            }
+
+            if (!yaExiste) {
+                eventosDto.add(entityToDto(eventoInvitado, inv.getEstado()));
+            }
+        }
+
         return eventosDto;
     }
 
     // obtener evento por id
-    public EventoDto obtenerPorId(Long id, String email) {
+    public EventoDetallesDto obtenerPorId(Long id, String email) {
         Optional<Evento> opt = eventoRepository.findById(id);
         if (opt.isEmpty()) {
             throw new RecursoNoEncontradoException("Evento no encontrado");
         }
 
         Evento evento = opt.get();
-        // Verificar que el usuario es el creador o está invitado
         boolean esCreador = evento.getCliente().getEmail().equals(email);
         boolean esInvitado = invitacionRepository.existsByEventoIdAndEmailAsistente(id, email);
 
@@ -75,7 +96,39 @@ public class EventoService {
             throw new NoAutorizadoException("No tienes permiso para ver este evento");
         }
 
-        return entityToDto(opt.get());
+        EventoDetallesDto dto = entityToDetalleDto(evento);
+
+        if (esCreador) {
+            List<InvitacionDto> invitaciones = invitacionRepository.findByEventoId(id)
+                .stream()
+                .map(this::invitacionToDto)
+                .toList();
+            dto.setInvitaciones(invitaciones);
+        }
+
+        return dto;
+    }
+
+    private EventoDetallesDto entityToDetalleDto(Evento e) {
+        EventoDetallesDto dto = new EventoDetallesDto();
+        dto.setId(e.getId());
+        dto.setTitulo(e.getTitulo());
+        dto.setDescripcion(e.getDescripcion());
+        dto.setFecha(e.getFecha());
+        dto.setUbicacion(e.getUbicacion());
+        dto.setCapacidad(e.getCapacidad());
+        dto.setClienteId(e.getCliente().getId());
+        dto.setClienteEmail(e.getCliente().getEmail());
+        return dto;
+    }
+
+    private InvitacionDto invitacionToDto(Invitacion invitacion) {
+        InvitacionDto dto = new InvitacionDto();
+        dto.setId(invitacion.getId());
+        dto.setEstado(invitacion.getEstado());
+        dto.setEventoId(invitacion.getEvento().getId());
+        dto.setEmailAsistente(invitacion.getEmailAsistente());
+        return dto;
     }
 
     // actualizar evento
@@ -127,8 +180,13 @@ public class EventoService {
         dto.setUbicacion(e.getUbicacion());
         dto.setCapacidad(e.getCapacidad());
         dto.setClienteId(e.getCliente().getId());
-        dto.setClienteId(e.getCliente().getId());
+        dto.setClienteEmail(e.getCliente().getEmail());
         return dto;
     }
 
+    private EventoDto entityToDto(Evento e, EstadoInvitacion estadoInvitacion) {
+        EventoDto dto = entityToDto(e);
+        dto.setMiEstadoInvitacion(estadoInvitacion);
+        return dto;
+    }
 }

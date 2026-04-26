@@ -25,4 +25,9 @@ public class InvitacionDto {
     @NotBlank(message = "El email del asistente es obligatorio")
     @Email
     private String emailAsistente;
+
+    private String eventoTitulo;
+    private String eventoFecha;
+    private String eventoUbicacion;
+    private String clienteEmail;
 }

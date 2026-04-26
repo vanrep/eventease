@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import eventease.Dto.EventoDetallesDto;
 import eventease.Dto.EventoDto;
 import eventease.Service.EventoService;
 import jakarta.validation.Valid;
@@ -49,7 +50,7 @@ public class EventoController {
     @GetMapping("/{id}")
     public ResponseEntity<EventoDto> obtenerEvento(@PathVariable Long id, Principal principal) {
         String email = principal.getName();    //email del usuario autenticado
-        EventoDto evento = eventoService.obtenerPorId(id, email);
+        EventoDetallesDto evento = eventoService.obtenerPorId(id, email);
         return ResponseEntity.ok(evento);
     }
 

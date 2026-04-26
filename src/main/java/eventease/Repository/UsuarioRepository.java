@@ -17,7 +17,4 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     // Comprobar si un email ya existe antes del registro
     boolean existsByEmail(String email);
 
-    // Comprobar si un DNI ya existe antes del registro
-    boolean existsByDni(String dni);
-    
 }

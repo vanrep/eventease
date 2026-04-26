@@ -32,6 +32,7 @@ public class GlobalExceptionHandler {
 
     }
 
+    // Error 401 para problemas de autenticación
     @ExceptionHandler(NoAutorizadoException.class)
     public ResponseEntity<String> error401(NoAutorizadoException ex) {
         return ResponseEntity

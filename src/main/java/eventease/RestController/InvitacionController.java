@@ -43,18 +43,18 @@ public class InvitacionController {
     }
 
     // aceptar invitación
-    @PutMapping("/{id}/aceptar")
-    public ResponseEntity<InvitacionDto> aceptarInvitacion(@PathVariable Long id, Principal principal) {
+    @PutMapping("/evento/{eventoId}/aceptar")
+    public ResponseEntity<InvitacionDto> aceptarInvitacion(@PathVariable Long eventoId, Principal principal) {
         String emailAsistente = principal.getName();
-        InvitacionDto actualizada = invitacionService.responderInvitacion(id, emailAsistente, EstadoInvitacion.ACEPTADA);
+        InvitacionDto actualizada = invitacionService.responderInvitacion(eventoId, emailAsistente, EstadoInvitacion.ACEPTADA);
         return ResponseEntity.ok(actualizada);
     }
 
     // rechazar invitación
-    @PutMapping("/{id}/rechazar")
-    public ResponseEntity<InvitacionDto> rechazarInvitacion(@PathVariable Long id, Principal principal) {
+    @PutMapping("/evento/{eventoId}/rechazar")
+    public ResponseEntity<InvitacionDto> rechazarInvitacion(@PathVariable Long eventoId, Principal principal) {
         String emailAsistente = principal.getName();
-        InvitacionDto actualizada = invitacionService.responderInvitacion(id, emailAsistente, EstadoInvitacion.RECHAZADA);
+        InvitacionDto actualizada = invitacionService.responderInvitacion(eventoId, emailAsistente, EstadoInvitacion.RECHAZADA);
         return ResponseEntity.ok(actualizada);
     }
 }

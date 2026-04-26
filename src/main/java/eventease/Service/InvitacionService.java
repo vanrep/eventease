@@ -63,8 +63,10 @@ public class InvitacionService {
         return dtos;
     }
 
-    public InvitacionDto responderInvitacion(Long id, String emailAsistente, EstadoInvitacion nuevoEstado) {
-        Optional<Invitacion> opt = invitacionRepository.findById(id);
+    public InvitacionDto responderInvitacion(Long eventoId, String emailAsistente, EstadoInvitacion nuevoEstado) {
+
+        Optional<Invitacion> opt = invitacionRepository.findByEventoIdAndEmailAsistente(eventoId, emailAsistente);
+
         if (opt.isEmpty()) {
             throw new RecursoNoEncontradoException("Invitación no encontrada");
         }
@@ -75,6 +77,7 @@ public class InvitacionService {
         if (!invitacion.getEmailAsistente().equals(emailAsistente)) {
             throw new NoAutorizadoException("No tienes permiso para responder esta invitación");
         }
+
         // Cambiar estado
         invitacion.setEstado(nuevoEstado);
 
@@ -84,10 +87,17 @@ public class InvitacionService {
 
     private InvitacionDto entityToDto(Invitacion i) {
         InvitacionDto dto = new InvitacionDto();
+
         dto.setId(i.getId());
         dto.setEstado(i.getEstado());
         dto.setEventoId(i.getEvento().getId());
         dto.setEmailAsistente(i.getEmailAsistente());
+
+        dto.setEventoTitulo(i.getEvento().getTitulo());
+        dto.setEventoFecha(i.getEvento().getFecha().toString());
+        dto.setEventoUbicacion(i.getEvento().getUbicacion());
+        dto.setClienteEmail(i.getEvento().getCliente().getEmail());
+
         return dto;
     }
 }

@@ -1,6 +1,7 @@
 package eventease.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -18,5 +19,6 @@ public interface InvitacionRepository extends JpaRepository<Invitacion, Long> {
 
     // Comprobar si un asistente ya está invitado al mismo evento
     boolean existsByEventoIdAndEmailAsistente(Long eventoId, String emailAsistente);
-    
+
+    Optional<Invitacion> findByEventoIdAndEmailAsistente(Long eventoId, String emailAsistente);
 }
