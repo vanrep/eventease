@@ -37,7 +37,13 @@ public class EventoDto {
     @Min(value = 1, message = "La capacidad debe ser al menos 1")
     private Integer capacidad;
 
+    // No se envia, se obtiene del token (principal), y se guarda el ID (de la tabla de Usuario) 
     private Long clienteId;
+
+    // No se guarda en BD, se obtiene a base del cliente, para mandarlo al frontend
     private String clienteEmail;
+
+    // cuando se crea un evento -> NULL - PENDIENTE, luego se modifica según estado elegido (ACEPTADA, RECHAZADA)
     private EstadoInvitacion miEstadoInvitacion;
+
 }

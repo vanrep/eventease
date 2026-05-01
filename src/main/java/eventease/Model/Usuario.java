@@ -10,8 +10,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Inheritance;
-import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,14 +21,13 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @Column(nullable = false)
     private String nombre;
 
     @Column(unique = true, nullable = false)
@@ -47,7 +44,6 @@ public class Usuario {
     @OneToMany(mappedBy = "cliente")
     private List<Evento> eventosCreados = new ArrayList<>();
 
-    @OneToMany(mappedBy = "emailAsistente")
-    private List<Invitacion> invitaciones = new ArrayList<>();
+ 
 
 }

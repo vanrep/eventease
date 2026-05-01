@@ -26,6 +26,7 @@ public class InvitacionDto {
     @Email
     private String emailAsistente;
 
+    // se obtienen para el frontend a traves del Evento (Invitacion.java)
     private String eventoTitulo;
     private String eventoFecha;
     private String eventoUbicacion;

@@ -49,19 +49,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             // validar token
             if (jwtService.isTokenValid(token, userDetails.getUsername())) {
-
+                // crea el objeto de un usuario autenticado para la petición
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities());
+                        userDetails,  //el usuario logueado
+                        null,  // credenciales no hacen falta, el JWT ya ha sido validado
+                        userDetails.getAuthorities()); // los roles y permisos
 
+                // extra info - IP address/ detalles de sesión
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // guardar usuario autenticado en el contexto
+                // guardar usuario autenticado en el contexto de esta petición
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-
+        // continua al siguiente filtro
         filterChain.doFilter(request, response);
     }
 }

@@ -17,21 +17,19 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // REGISTER
+    // registrar un usuario
     public UsuarioDto registrarUsuario(UsuarioDto dto) {
 
-        // si el email ya existe
-         if (usuarioRepository.existsByEmail(dto.getEmail())) {
+        // comprobar si el email ya está registrado
+        if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new ConflictException("El email ya está registrado");
         }
-
-        // si el DNI ya existe
-
         // crea usuario nuevo
         Usuario u = new Usuario();
-
+       
+        // el nombre es opcional
         if (dto.getNombre() == null || dto.getNombre().isBlank()) {
-            u.setNombre(null);
+            u.setNombre(null);  // guarda null
         } else {
             u.setNombre(dto.getNombre().trim());
         }
@@ -42,18 +40,18 @@ public class UsuarioService {
 
         // guarda usuario
         Usuario guardado = usuarioRepository.save(u);
-        
-        // devuelve UsuarioDto
+
+        // devuelve UsuarioDto (con ID, pero SIN contraseña)
         return entityToDto(guardado);
     }
 
     // entity -> DTO
     private UsuarioDto entityToDto(Usuario u) {
-    UsuarioDto dto = new UsuarioDto();
-    dto.setId(u.getId());
-    dto.setNombre(u.getNombre());
-    dto.setEmail(u.getEmail());
-    return dto;
-}
+        UsuarioDto dto = new UsuarioDto();
+        dto.setId(u.getId());
+        dto.setNombre(u.getNombre());
+        dto.setEmail(u.getEmail());
+        return dto;
+    }
 
 }

@@ -47,10 +47,5 @@ public class Evento {
     @OneToMany(mappedBy = "evento")
     private List<Invitacion> invitaciones = new ArrayList<>();
 
-    // @OneToMany
-    // private List<Usuario> asistentes;
-    // Esto no puede ser de tipo List<Usuario.role.ASISTENTE> porque no es un tipo, es un valor del enum.
-    // Usuario.role es un enum de tipo string, entonces si quisieras tener una lista el tipo sería List<string>.
-    // En este caso los asistentes son un tipo de Usuario, entonces tu lista es de Usuarios, pero todos los usuarios 
-    // de esa lista tendrán tipo "ASISTENTE".
+
 }

@@ -25,8 +25,7 @@ public class InvitacionService {
     private final EventoRepository eventoRepository;
 
     public InvitacionDto crearInvitacion(InvitacionDto dto, String emailCreador) {
-
-        // Buscar el evento
+        // Buscar el evento por id del dto
         Optional<Evento> eventoOpt = eventoRepository.findById(dto.getEventoId());
         if (eventoOpt.isEmpty()) {
             throw new RecursoNoEncontradoException("Evento no encontrado");
@@ -47,13 +46,13 @@ public class InvitacionService {
         Invitacion invitacion = new Invitacion();
         invitacion.setEvento(evento);
         invitacion.setEmailAsistente(dto.getEmailAsistente());
-        invitacion.setEstado(EstadoInvitacion.PENDIENTE);
+        invitacion.setEstado(EstadoInvitacion.PENDIENTE); // default estado "pendiente" para nuevas invitaciones
 
         Invitacion guardada = invitacionRepository.save(invitacion);
-
         return entityToDto(guardada);
     }
 
+    // listar todas las invitaciones (solo para usuarios registrados)
     public List<InvitacionDto> listarMisInvitaciones(String emailAsistente) {
         List<Invitacion> invitaciones = invitacionRepository.findByEmailAsistente(emailAsistente);
         List<InvitacionDto> dtos = new ArrayList<>();
@@ -64,7 +63,40 @@ public class InvitacionService {
     }
 
     public InvitacionDto responderInvitacion(Long eventoId, String emailAsistente, EstadoInvitacion nuevoEstado) {
+        // busca la invitacion con el id del evento y el correo del invitado
+        Optional<Invitacion> opt = invitacionRepository.findByEventoIdAndEmailAsistente(eventoId, emailAsistente);
 
+        if (opt.isEmpty()) {
+            throw new RecursoNoEncontradoException("Invitación no encontrada");
+        }
+        Invitacion invitacion = opt.get();
+        // Cambiar estado
+        invitacion.setEstado(nuevoEstado);
+        Invitacion actualizada = invitacionRepository.save(invitacion);
+        return entityToDto(actualizada);
+    }
+
+    // se rellenan todos las propiedades de InvitacionDto
+    private InvitacionDto entityToDto(Invitacion i) {
+        InvitacionDto dto = new InvitacionDto();
+        dto.setId(i.getId());
+        dto.setEstado(i.getEstado());
+        dto.setEventoId(i.getEvento().getId());
+        dto.setEmailAsistente(i.getEmailAsistente());
+        dto.setEventoTitulo(i.getEvento().getTitulo());
+        dto.setEventoFecha(i.getEvento().getFecha().toString());
+        dto.setEventoUbicacion(i.getEvento().getUbicacion());
+        dto.setClienteEmail(i.getEvento().getCliente().getEmail());
+        return dto;
+    }
+
+    public InvitacionDto responderInvitacionPublica(String datos, EstadoInvitacion nuevoEstado) {
+        // "datos" simula los datos cifrados del enlace del email
+        // en una versión real, aquí se descifraría y obtendríamos el id del evento y el email del invitado
+        Long eventoId = 123L; // valor simulado
+        String emailAsistente = "test@email.com"; // valor simulado
+
+        // buscamos la invitación con el evento y el email del invitado
         Optional<Invitacion> opt = invitacionRepository.findByEventoIdAndEmailAsistente(eventoId, emailAsistente);
 
         if (opt.isEmpty()) {
@@ -73,31 +105,11 @@ public class InvitacionService {
 
         Invitacion invitacion = opt.get();
 
-        // Comprobar que el usuario es el invitado
-        if (!invitacion.getEmailAsistente().equals(emailAsistente)) {
-            throw new NoAutorizadoException("No tienes permiso para responder esta invitación");
-        }
-
-        // Cambiar estado
+        // cambiamos el estado a ACEPTADA o RECHAZADA
         invitacion.setEstado(nuevoEstado);
 
         Invitacion actualizada = invitacionRepository.save(invitacion);
+
         return entityToDto(actualizada);
-    }
-
-    private InvitacionDto entityToDto(Invitacion i) {
-        InvitacionDto dto = new InvitacionDto();
-
-        dto.setId(i.getId());
-        dto.setEstado(i.getEstado());
-        dto.setEventoId(i.getEvento().getId());
-        dto.setEmailAsistente(i.getEmailAsistente());
-
-        dto.setEventoTitulo(i.getEvento().getTitulo());
-        dto.setEventoFecha(i.getEvento().getFecha().toString());
-        dto.setEventoUbicacion(i.getEvento().getUbicacion());
-        dto.setClienteEmail(i.getEvento().getCliente().getEmail());
-
-        return dto;
     }
 }

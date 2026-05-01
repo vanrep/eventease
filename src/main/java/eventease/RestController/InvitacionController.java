@@ -46,7 +46,9 @@ public class InvitacionController {
     @PutMapping("/evento/{eventoId}/aceptar")
     public ResponseEntity<InvitacionDto> aceptarInvitacion(@PathVariable Long eventoId, Principal principal) {
         String emailAsistente = principal.getName();
-        InvitacionDto actualizada = invitacionService.responderInvitacion(eventoId, emailAsistente, EstadoInvitacion.ACEPTADA);
+        // se envia el eventoId (del url), email del token, y el estado del endpoint
+        InvitacionDto actualizada = invitacionService.responderInvitacion(eventoId, emailAsistente,
+                EstadoInvitacion.ACEPTADA);
         return ResponseEntity.ok(actualizada);
     }
 
@@ -54,7 +56,25 @@ public class InvitacionController {
     @PutMapping("/evento/{eventoId}/rechazar")
     public ResponseEntity<InvitacionDto> rechazarInvitacion(@PathVariable Long eventoId, Principal principal) {
         String emailAsistente = principal.getName();
-        InvitacionDto actualizada = invitacionService.responderInvitacion(eventoId, emailAsistente, EstadoInvitacion.RECHAZADA);
+        // se envia el eventoId (del url), email del token, y el estado del endpoint
+        InvitacionDto actualizada = invitacionService.responderInvitacion(eventoId, emailAsistente,
+                EstadoInvitacion.RECHAZADA);
+        return ResponseEntity.ok(actualizada);
+    }
+
+
+    // ----------- SIMULACIÓN DE LOS ENDPOINTS PARA INVITACIONES DESDE ENLACES PÚBLICOS ---------------
+    @PutMapping("/public/aceptar")
+    public ResponseEntity<InvitacionDto> aceptarInvitacionPublica(@RequestBody String datos) {
+        // "datos" simula los datos cifrados que vienen en el enlace del email
+        InvitacionDto actualizada = invitacionService.responderInvitacionPublica(datos,EstadoInvitacion.ACEPTADA);
+        return ResponseEntity.ok(actualizada);
+    }
+
+    @PutMapping("/public/rechazar")
+    public ResponseEntity<InvitacionDto> rechazarInvitacionPublica(@RequestBody String datos) {
+        // "datos"" simula los datos cifrados que vienen en el enlace del email
+        InvitacionDto actualizada = invitacionService.responderInvitacionPublica(datos,EstadoInvitacion.RECHAZADA);
         return ResponseEntity.ok(actualizada);
     }
 }

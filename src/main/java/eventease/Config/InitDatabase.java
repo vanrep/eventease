@@ -1,6 +1,5 @@
 package eventease.Config;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -17,16 +16,12 @@ public class InitDatabase implements CommandLineRunner {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${spring.jpa.hibernate.ddl-auto}")
-    private String ddlAuto;
-
     @Override
     public void run(String... args) {
         if (usuarioRepository.count() > 0) {
             return;
         }
-
-        // Con create-drop se recrean las tablas, así que sembramos los usuarios base de nuevo.
+        // si no hay usuarios en la BD (en el caso de create-drop), crea algunos de prueba
         crearUsuario("Vanja", "vanja@email.com", Role.ADMIN);
         crearUsuario("Mateo", "mateo@email.com", Role.CLIENTE);
         crearUsuario("Elena", "elena@email.com", Role.CLIENTE);

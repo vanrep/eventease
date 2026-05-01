@@ -57,13 +57,13 @@ public class SecurityConfig {
                 // API stateless con JWT
                 .csrf(csrf -> csrf.disable())
 
-                // peticiones independientes
+                // peticiones independientes, no guarda sesiones
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
                 // rutas públicas vs privadas
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/register", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/auth/**", "/register", "/invitaciones/public/**", "/css/**", "/js/**").permitAll()
                         .anyRequest().authenticated())
 
                 // añade filtro JWT antes del filtro normal de Spring
@@ -83,11 +83,11 @@ public class SecurityConfig {
         // permitir métodos HTTP
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        // permitir cabeceras
+        // permitir todas las cabeceras
         configuration.setAllowedHeaders(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        source.registerCorsConfiguration("/**", configuration); // aplicar cors config para todos los endpoints
 
         return source;
     }

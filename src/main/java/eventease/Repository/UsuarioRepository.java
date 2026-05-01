@@ -9,8 +9,7 @@ import eventease.Model.Usuario;
 
 @Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-  
-  
+    
     // Buscar un usuario por email para login/autenticación
     Optional<Usuario> findByEmail(String email);
 

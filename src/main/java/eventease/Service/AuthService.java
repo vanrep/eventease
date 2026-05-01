@@ -24,7 +24,7 @@ public class AuthService {
     // iniciar sesión y devolver token
     public AuthResponseDto login(LoginRequestDto dto) {
 
-        // buscar usuario por email
+        // buscar usuario por  email
         Optional<Usuario> opt = usuarioRepository.findByEmail(dto.getEmail());
 
         if (opt.isEmpty()) {

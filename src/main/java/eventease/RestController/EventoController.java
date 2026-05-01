@@ -27,31 +27,14 @@ public class EventoController {
 
     private final EventoService eventoService;
 
-    // listar eventos del usuario logeado
-    @GetMapping
-    public ResponseEntity<List<EventoDto>> listarEventos(Principal principal) {
-        String email = principal.getName();
-        List<EventoDto> eventos = eventoService.listarEventosPorEmail(email);
-        return ResponseEntity.ok(eventos);
-    }
-
     // crear evento
     @PostMapping
     public ResponseEntity<EventoDto> crearEvento(@Valid @RequestBody EventoDto dto, Principal principal) {
         String email = principal.getName();
         EventoDto creado = eventoService.crearEvento(dto, email);
-
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(creado);
-    }
-
-    // obtener evento por id
-    @GetMapping("/{id}")
-    public ResponseEntity<EventoDto> obtenerEvento(@PathVariable Long id, Principal principal) {
-        String email = principal.getName();    //email del usuario autenticado
-        EventoDetallesDto evento = eventoService.obtenerPorId(id, email);
-        return ResponseEntity.ok(evento);
     }
 
     // actualizar evento
@@ -69,6 +52,22 @@ public class EventoController {
         String email = principal.getName();
         eventoService.eliminarEvento(id, email);
         return ResponseEntity.noContent().build();
+    }
+
+    // listar eventos del usuario logeado
+    @GetMapping
+    public ResponseEntity<List<EventoDto>> listarEventos(Principal principal) {
+        String email = principal.getName();
+        List<EventoDto> eventos = eventoService.listarEventosPorEmail(email);
+        return ResponseEntity.ok(eventos);
+    }
+
+    // obtener evento por id
+    @GetMapping("/{id}")
+    public ResponseEntity<EventoDto> obtenerEvento(@PathVariable Long id, Principal principal) {
+        String email = principal.getName(); // email del usuario autenticado
+        EventoDetallesDto evento = eventoService.obtenerPorId(id, email);
+        return ResponseEntity.ok(evento);
     }
 
 }

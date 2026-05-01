@@ -19,23 +19,18 @@ public class UsuarioController {
 
     private final UsuarioService usuarioService;
 
-    // REGISTER
-    // auth.service.ts -->
+    // registrar un usuario
     @PostMapping("/register")
     public ResponseEntity<UsuarioDto> register(@Valid @RequestBody UsuarioDto dto){
         
         UsuarioDto usuarioGuardado = usuarioService.registrarUsuario(dto);
 
         return ResponseEntity
-            // El alta ya no usa DNI; devolvemos la ubicación con el id generado.
+            // devolvemos la ubicación con el id generado
             .created(URI.create("/usuarios/" + usuarioGuardado.getId()))
             .body(usuarioGuardado);
     }
         
-    
-        
-       
-
 
 
 
