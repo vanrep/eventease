@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import eventease.Dto.EventoDto;
 import eventease.Dto.EventoDetallesDto;
@@ -71,6 +72,7 @@ public class EventoService {
     }
 
     // eliminar evento
+    @Transactional
     public void eliminarEvento(Long id, String email) {
         Optional<Evento> opt = eventoRepository.findById(id);
         if (opt.isEmpty()) {
@@ -81,6 +83,8 @@ public class EventoService {
         if (!e.getCliente().getEmail().equals(email)) {
             throw new eventease.Exception.NoAutorizadoException("No tienes permiso para eliminar este evento");
         }
+        // borrar las invitaciones también
+        invitacionRepository.deleteByEventoId(id);
         eventoRepository.delete(e);
     }
 

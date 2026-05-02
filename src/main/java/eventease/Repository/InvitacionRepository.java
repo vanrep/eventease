@@ -21,4 +21,6 @@ public interface InvitacionRepository extends JpaRepository<Invitacion, Long> {
     boolean existsByEventoIdAndEmailAsistente(Long eventoId, String emailAsistente);
 
     Optional<Invitacion> findByEventoIdAndEmailAsistente(Long eventoId, String emailAsistente);
+
+    void deleteByEventoId(Long eventoId);
 }
