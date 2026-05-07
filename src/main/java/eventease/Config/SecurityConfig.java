@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,6 +23,7 @@ import eventease.Service.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
 
 @EnableWebSecurity
+@EnableMethodSecurity
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
@@ -53,7 +55,7 @@ public class SecurityConfig {
                 .cors(cors -> {
                 })
 
-                // CSRP desactivado porque no se usan formularios de login de Spring - se usa
+                // CSRF desactivado porque no se usan formularios de login de Spring - se usa
                 // API stateless con JWT
                 .csrf(csrf -> csrf.disable())
 
@@ -64,6 +66,7 @@ public class SecurityConfig {
                 // rutas públicas vs privadas
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**", "/register", "/invitaciones/public/**", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
                 // añade filtro JWT antes del filtro normal de Spring

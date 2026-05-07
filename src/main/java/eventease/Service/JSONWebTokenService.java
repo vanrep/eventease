@@ -22,10 +22,11 @@ public class JSONWebTokenService {
     private long expiration;
 
     // generar token
-    public String generateToken(String email, Long userId) {
+    public String generateToken(String email, Long userId, String rol) {
         return Jwts.builder()
                 .setSubject(email) // guarda el email dentro del token
                 .claim("userId", userId) // guarda el ID numérico
+                .claim("rol", rol) // guarda el rol del usuario
                 .setIssuedAt(new Date()) // fecha de creación
                 .setExpiration(new Date(System.currentTimeMillis() + expiration)) // 1 hora
                 .signWith(getKey()) // firma el token

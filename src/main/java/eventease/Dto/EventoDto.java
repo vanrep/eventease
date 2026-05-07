@@ -23,7 +23,6 @@ public class EventoDto {
     @NotBlank(message = "El título es obligatorio")
     private String titulo;
 
-    @NotBlank(message = "La descripción es obligatoria")
     private String descripcion;
 
     @NotNull(message = "La fecha es obligatoria")

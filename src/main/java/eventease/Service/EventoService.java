@@ -15,6 +15,7 @@ import eventease.Exception.RecursoNoEncontradoException;
 import eventease.Model.EstadoInvitacion;
 import eventease.Model.Evento;
 import eventease.Model.Invitacion;
+import eventease.Model.Role;
 import eventease.Model.Usuario;
 import eventease.Repository.EventoRepository;
 import eventease.Repository.InvitacionRepository;
@@ -90,8 +91,8 @@ public class EventoService {
 
     // listar eventos por email (usuario logeado)
     public List<EventoDto> listarEventosPorEmail(String email) {
-        // eventos creados por el usuario
-        List<Evento> eventosPropios = eventoRepository.findByClienteEmail(email);
+        List<Evento> eventosPropios;
+        eventosPropios = eventoRepository.findByClienteEmail(email);
 
         // eventos donde aparece el email del usuario (invitaciones)
         List<Invitacion> invitaciones = invitacionRepository.findByEmailAsistente(email);
@@ -127,16 +128,19 @@ public class EventoService {
             throw new RecursoNoEncontradoException("Evento no encontrado");
         }
         Evento evento = opt.get();
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+        boolean esAdmin = usuario.getRol() == Role.ADMIN;
 
         // comprobamos si el email del cliente (Usuario cliente en entidad Evento) es
         // igual al email en la petición
         boolean esCreador = evento.getCliente().getEmail().equals(email);
         // comprobamos si el email en la petición corresponde a alguna de las
         // invitaciónes del evento con ese id
-        boolean esInvitado = invitacionRepository.existsByEventoIdAndEmailAsistente(id, email);
+        boolean esInvitado = !esAdmin && invitacionRepository.existsByEventoIdAndEmailAsistente(id, email);
         // si no es creador y si no ha sido invitado, no tiene permisos para ver
         // detalles
-        if (!esCreador && !esInvitado) {
+        if (!esAdmin && !esCreador && !esInvitado) {
             throw new NoAutorizadoException("No tienes permiso para ver este evento");
         }
         // convertimos el evento al EventoDetallesDto que hereda de EventoDto + lista de
@@ -145,7 +149,7 @@ public class EventoService {
 
         // si es creador del evento - añadimos al dto la lista de todas las invitaciones
         // mandadas
-        if (esCreador) {
+        if (esCreador || esAdmin) {
             // buscamos todas las invitaciones del evento
             List<Invitacion> lista = invitacionRepository.findByEventoId(id);
 
