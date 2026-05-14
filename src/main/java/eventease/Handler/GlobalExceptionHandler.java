@@ -11,9 +11,7 @@ import eventease.Exception.RecursoNoEncontradoException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-    // Error 404 para los recursos no encontrados:
-
+    // Error 404 para los recursos no encontrados
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<String> error404(RecursoNoEncontradoException ex) {
         return ResponseEntity
@@ -23,7 +21,6 @@ public class GlobalExceptionHandler {
     }
 
     // Error 409 para los conflictos
-
     @ExceptionHandler(ConflictException.class)
     public ResponseEntity<String> error409(ConflictException ex) {
         return ResponseEntity

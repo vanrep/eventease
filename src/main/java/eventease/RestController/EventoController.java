@@ -27,7 +27,7 @@ public class EventoController {
 
     private final EventoService eventoService;
 
-    // crear evento
+    // Crea un evento
     @PostMapping
     public ResponseEntity<EventoDto> crearEvento(@Valid @RequestBody EventoDto dto, Principal principal) {
         String email = principal.getName();
@@ -37,7 +37,7 @@ public class EventoController {
                 .body(creado);
     }
 
-    // actualizar evento
+    // Actualiza un evento
     @PutMapping("/{id}")
     public ResponseEntity<EventoDto> actualizarEvento(@PathVariable Long id, @Valid @RequestBody EventoDto dto,
             Principal principal) {
@@ -46,7 +46,7 @@ public class EventoController {
         return ResponseEntity.ok(actualizado);
     }
 
-    // eliminar evento
+    // Elimina un evento
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarEvento(@PathVariable Long id, Principal principal) {
         String email = principal.getName();
@@ -54,7 +54,7 @@ public class EventoController {
         return ResponseEntity.noContent().build();
     }
 
-    // listar eventos del usuario logeado
+    // Lista los eventos del usuario logueado
     @GetMapping
     public ResponseEntity<List<EventoDto>> listarEventos(Principal principal) {
         String email = principal.getName();
@@ -62,7 +62,7 @@ public class EventoController {
         return ResponseEntity.ok(eventos);
     }
 
-    // obtener evento por id
+    // Obtiene un evento por id
     @GetMapping("/{id}")
     public ResponseEntity<EventoDto> obtenerEvento(@PathVariable Long id, Principal principal) {
         String email = principal.getName(); // email del usuario autenticado

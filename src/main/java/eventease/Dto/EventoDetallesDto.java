@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EventoDetallesDto extends EventoDto {
-    
-    // detalles de un evento + todas las invitaciones relacionadas
+
+    // Detalles de un evento y todas las invitaciones relacionadas
     private List<InvitacionDto> invitaciones = new ArrayList<>();
 }

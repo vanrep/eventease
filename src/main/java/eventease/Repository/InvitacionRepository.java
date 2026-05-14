@@ -10,14 +10,14 @@ import eventease.Model.Invitacion;
 
 @Repository
 public interface InvitacionRepository extends JpaRepository<Invitacion, Long> {
-        
-    // Obtener todas las invitaciones de un asistente/usuario por email
+
+    // Obtiene todas las invitaciones de un asistente por email
     List<Invitacion> findByEmailAsistente(String email);
 
-    // Obtener todas las invitaciones de un evento
+    // Obtiene todas las invitaciones de un evento
     List<Invitacion> findByEventoId(Long eventoId);
 
-    // Comprobar si un asistente ya está invitado al mismo evento
+    // Comprueba si un asistente ya está invitado al mismo evento
     boolean existsByEventoIdAndEmailAsistente(Long eventoId, String emailAsistente);
 
     Optional<Invitacion> findByEventoIdAndEmailAsistente(Long eventoId, String emailAsistente);

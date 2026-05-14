@@ -17,18 +17,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter    @Setter
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Evento {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     private String titulo;
- 
+
     @Column(nullable = true)
     private String descripcion;
 
@@ -46,6 +47,5 @@ public class Evento {
 
     @OneToMany(mappedBy = "evento")
     private List<Invitacion> invitaciones = new ArrayList<>();
-
 
 }

@@ -33,7 +33,6 @@ public class Usuario {
     @Column(unique = true, nullable = false)
     private String email;
 
-
     @Column(nullable = false)
     private String password;
 
@@ -43,7 +42,5 @@ public class Usuario {
 
     @OneToMany(mappedBy = "cliente")
     private List<Evento> eventosCreados = new ArrayList<>();
-
- 
 
 }

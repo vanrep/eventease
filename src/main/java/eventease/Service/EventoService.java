@@ -31,12 +31,12 @@ public class EventoService {
     private final InvitacionRepository invitacionRepository;
 
     public EventoDto crearEvento(EventoDto dto, String email) {
-        // buscar cliente por email (del token)
+        // Busca el cliente por el email del token
         Optional<Usuario> opt = usuarioRepository.findByEmail(email);
         if (opt.isEmpty()) {
             throw new RecursoNoEncontradoException("Usuario no encontrado");
         }
-        // crear entidad
+        // Crea la entidad
         Evento e = new Evento();
         e.setTitulo(dto.getTitulo());
         e.setDescripcion(dto.getDescripcion());
@@ -49,19 +49,19 @@ public class EventoService {
         return entityToDto(guardado);
     }
 
-    // actualizar evento
+    // Actualiza el evento
     public EventoDto actualizarEvento(Long id, EventoDto dto, String email) {
-        // buscamos el evento
+        // Busca el evento
         Optional<Evento> opt = eventoRepository.findById(id);
         if (opt.isEmpty()) {
             throw new RecursoNoEncontradoException("Evento no encontrado");
         }
         Evento e = opt.get();
-        // Verificar que el usuario autenticado sea el dueño
+        // Verifica que el usuario autenticado sea el dueño
         if (!e.getCliente().getEmail().equals(email)) {
             throw new eventease.Exception.NoAutorizadoException("No tienes permiso para editar este evento");
         }
-        // actualizamos el evento
+        // Actualiza el evento
         e.setTitulo(dto.getTitulo());
         e.setDescripcion(dto.getDescripcion());
         e.setFecha(dto.getFecha());
@@ -72,7 +72,7 @@ public class EventoService {
         return entityToDto(guardado);
     }
 
-    // eliminar evento
+    // Elimina el evento
     @Transactional
     public void eliminarEvento(Long id, String email) {
         Optional<Evento> opt = eventoRepository.findById(id);
@@ -80,39 +80,39 @@ public class EventoService {
             throw new RecursoNoEncontradoException("Evento no encontrado");
         }
         Evento e = opt.get();
-        // Verificar que el usuario autenticado sea el creador del evento
+        // Verifica que el usuario autenticado sea el creador del evento
         if (!e.getCliente().getEmail().equals(email)) {
             throw new eventease.Exception.NoAutorizadoException("No tienes permiso para eliminar este evento");
         }
-        // borrar las invitaciones también
+        // Borra también las invitaciones
         invitacionRepository.deleteByEventoId(id);
         eventoRepository.delete(e);
     }
 
-    // listar eventos por email (usuario logeado)
+    // Lista los eventos por email del usuario logueado
     public List<EventoDto> listarEventosPorEmail(String email) {
         List<Evento> eventosPropios;
         eventosPropios = eventoRepository.findByClienteEmail(email);
 
-        // eventos donde aparece el email del usuario (invitaciones)
+        // Eventos donde aparece el email del usuario en las invitaciones
         List<Invitacion> invitaciones = invitacionRepository.findByEmailAsistente(email);
 
         List<EventoDto> eventosDto = new ArrayList<>();
 
-        // estado invitación será NULL
+        // El estado de invitación será null
         for (Evento e : eventosPropios) {
             eventosDto.add(entityToDto(e));
         }
         for (Invitacion inv : invitaciones) {
             Evento eventoInvitado = inv.getEvento();
             boolean yaExiste = false;
-            // evitar duplicados
+            // Evita duplicados
             for (EventoDto dto : eventosDto) {
                 if (dto.getId().equals(eventoInvitado.getId())) {
                     yaExiste = true;
                 }
             }
-            // si aún no está en la lista, lo añade con el estado
+            // Si aún no está en la lista, lo añade con el estado
             if (!yaExiste) {
                 eventosDto.add(entityToDto(eventoInvitado, inv.getEstado()));
             }
@@ -120,9 +120,9 @@ public class EventoService {
         return eventosDto;
     }
 
-    // obtener evento por id
+    // Obtiene un evento por id
     public EventoDetallesDto obtenerPorId(Long id, String email) {
-        // buscar evento por ID
+        // Busca el evento por ID
         Optional<Evento> opt = eventoRepository.findById(id);
         if (opt.isEmpty()) {
             throw new RecursoNoEncontradoException("Evento no encontrado");
@@ -132,29 +132,26 @@ public class EventoService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
         boolean esAdmin = usuario.getRol() == Role.ADMIN;
 
-        // comprobamos si el email del cliente (Usuario cliente en entidad Evento) es
-        // igual al email en la petición
+        // Comprueba si el email del cliente del evento es igual al email de la petición
         boolean esCreador = evento.getCliente().getEmail().equals(email);
-        // comprobamos si el email en la petición corresponde a alguna de las
-        // invitaciónes del evento con ese id
+        // Comprueba si el email de la petición corresponde a alguna de las
+        // invitaciones del evento con ese id
         boolean esInvitado = !esAdmin && invitacionRepository.existsByEventoIdAndEmailAsistente(id, email);
-        // si no es creador y si no ha sido invitado, no tiene permisos para ver
+        // Si no es creador y no ha sido invitado, no tiene permisos para ver los
         // detalles
         if (!esAdmin && !esCreador && !esInvitado) {
             throw new NoAutorizadoException("No tienes permiso para ver este evento");
         }
-        // convertimos el evento al EventoDetallesDto que hereda de EventoDto + lista de
-        // invitaciones
+        // Convierte el evento a EventoDetallesDto con su lista de invitaciones
         EventoDetallesDto dto = entityToDetalleDto(evento);
 
-        // si es creador del evento - añadimos al dto la lista de todas las invitaciones
-        // mandadas
+        // Si es creador o admin, añade al DTO la lista de invitaciones enviadas
         if (esCreador || esAdmin) {
-            // buscamos todas las invitaciones del evento
+            // Busca todas las invitaciones del evento
             List<Invitacion> lista = invitacionRepository.findByEventoId(id);
 
             List<InvitacionDto> invitaciones = new ArrayList<>();
-            // las convertimos al dto y añadimos a la lista
+            // Las convierte a DTO y las añade a la lista
             for (Invitacion inv : lista) {
                 invitaciones.add(invitacionToDto(inv));
             }
@@ -163,7 +160,7 @@ public class EventoService {
         return dto;
     }
 
-    // se usa solo si el usuario es creador del evento
+    // Se usa solo si el usuario es creador del evento
     private InvitacionDto invitacionToDto(Invitacion invitacion) {
         InvitacionDto dto = new InvitacionDto();
         dto.setId(invitacion.getId());
@@ -173,7 +170,7 @@ public class EventoService {
         return dto;
     }
 
-    // convertir entidad a dto
+    // Convierte la entidad a DTO
     private EventoDto entityToDto(Evento e) {
         EventoDto dto = new EventoDto();
         dto.setId(e.getId());
@@ -187,14 +184,14 @@ public class EventoService {
         return dto;
     }
 
-    // entityToDto pero con el parametro extra de estado
+    // Igual que entityToDto, pero con el parámetro extra de estado
     private EventoDto entityToDto(Evento e, EstadoInvitacion estadoInvitacion) {
         EventoDto dto = entityToDto(e);
         dto.setMiEstadoInvitacion(estadoInvitacion);
         return dto;
     }
 
-    // igual que entityToDto, pero devuelve EventoDetalleDto
+    // Igual que entityToDto, pero devuelve EventoDetallesDto
     private EventoDetallesDto entityToDetalleDto(Evento e) {
         EventoDetallesDto dto = new EventoDetallesDto();
         dto.setId(e.getId());

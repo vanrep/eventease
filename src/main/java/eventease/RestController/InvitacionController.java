@@ -26,7 +26,7 @@ public class InvitacionController {
 
     private final InvitacionService invitacionService;
 
-    // crear invitación (el cliente invita a un asistente)
+    // Crea una invitación desde el cliente a un asistente
     @PostMapping
     public ResponseEntity<InvitacionDto> crearInvitacion(@Valid @RequestBody InvitacionDto dto, Principal principal) {
         String emailCreador = principal.getName();
@@ -34,7 +34,7 @@ public class InvitacionController {
         return ResponseEntity.status(HttpStatus.CREATED).body(creada);
     }
 
-    // listar las invitaciones del asistente logueado
+    // Lista las invitaciones del asistente logueado
     @GetMapping
     public ResponseEntity<List<InvitacionDto>> listarMisInvitaciones(Principal principal) {
         String emailAsistente = principal.getName();
@@ -42,39 +42,38 @@ public class InvitacionController {
         return ResponseEntity.ok(misInvitaciones);
     }
 
-    // aceptar invitación
+    // Acepta una invitación
     @PutMapping("/evento/{eventoId}/aceptar")
     public ResponseEntity<InvitacionDto> aceptarInvitacion(@PathVariable Long eventoId, Principal principal) {
         String emailAsistente = principal.getName();
-        // se envia el eventoId (del url), email del token, y el estado del endpoint
+        // Envía el eventoId de la URL, el email del token y el estado del endpoint
         InvitacionDto actualizada = invitacionService.responderInvitacion(eventoId, emailAsistente,
                 EstadoInvitacion.ACEPTADA);
         return ResponseEntity.ok(actualizada);
     }
 
-    // rechazar invitación
+    // Rechaza una invitación
     @PutMapping("/evento/{eventoId}/rechazar")
     public ResponseEntity<InvitacionDto> rechazarInvitacion(@PathVariable Long eventoId, Principal principal) {
         String emailAsistente = principal.getName();
-        // se envia el eventoId (del url), email del token, y el estado del endpoint
+        // Envía el eventoId de la URL, el email del token y el estado del endpoint
         InvitacionDto actualizada = invitacionService.responderInvitacion(eventoId, emailAsistente,
                 EstadoInvitacion.RECHAZADA);
         return ResponseEntity.ok(actualizada);
     }
 
-
     // ----------- SIMULACIÓN DE LOS ENDPOINTS PARA INVITACIONES DESDE ENLACES PÚBLICOS ---------------
     @PutMapping("/public/aceptar")
     public ResponseEntity<InvitacionDto> aceptarInvitacionPublica(@RequestBody String datos) {
-        // "datos" simula los datos cifrados que vienen en el enlace del email
-        InvitacionDto actualizada = invitacionService.responderInvitacionPublica(datos,EstadoInvitacion.ACEPTADA);
+        // "datos" simula los datos cifrados del enlace del email que llegan en el body
+        InvitacionDto actualizada = invitacionService.responderInvitacionPublica(datos, EstadoInvitacion.ACEPTADA);
         return ResponseEntity.ok(actualizada);
     }
 
     @PutMapping("/public/rechazar")
     public ResponseEntity<InvitacionDto> rechazarInvitacionPublica(@RequestBody String datos) {
-        // "datos"" simula los datos cifrados que vienen en el enlace del email
-        InvitacionDto actualizada = invitacionService.responderInvitacionPublica(datos,EstadoInvitacion.RECHAZADA);
+        // "datos" simula los datos cifrados del enlace del email que llegan en el body
+        InvitacionDto actualizada = invitacionService.responderInvitacionPublica(datos, EstadoInvitacion.RECHAZADA);
         return ResponseEntity.ok(actualizada);
     }
 }

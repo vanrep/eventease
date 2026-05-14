@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthResponseDto {
-        
-    // token JWT que se devolverá al hacer login
+
+    // Token JWT que se devuelve al hacer login
     private String token;
 }

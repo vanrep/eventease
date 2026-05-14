@@ -21,10 +21,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JSONWebTokenService jwtService;
 
-    // iniciar sesión y devolver token
+    // Inicia sesión y devuelve el token
     public AuthResponseDto login(LoginRequestDto dto) {
 
-        // buscar usuario por  email
+        // Busca el usuario por email
         Optional<Usuario> opt = usuarioRepository.findByEmail(dto.getEmail());
 
         if (opt.isEmpty()) {
@@ -33,12 +33,12 @@ public class AuthService {
 
         Usuario usuario = opt.get();
 
-        // comprobar contraseña
+        // Comprueba la contraseña
         if (!passwordEncoder.matches(dto.getPassword(), usuario.getPassword())) {
             throw new NoAutorizadoException("Contraseña incorrecta");
         }
 
-        // generar token con email e ID
+        // Genera el token con el email y el ID
         String token = jwtService.generateToken(usuario.getEmail(), usuario.getId(), usuario.getRol().name());
 
         return new AuthResponseDto(token);

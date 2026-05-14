@@ -25,34 +25,34 @@ public class InvitacionService {
     private final EventoRepository eventoRepository;
 
     public InvitacionDto crearInvitacion(InvitacionDto dto, String emailCreador) {
-        // Buscar el evento por id del dto
+        // Busca el evento por el id del DTO
         Optional<Evento> eventoOpt = eventoRepository.findById(dto.getEventoId());
         if (eventoOpt.isEmpty()) {
             throw new RecursoNoEncontradoException("Evento no encontrado");
         }
         Evento evento = eventoOpt.get();
 
-        // Verificar que el usuario que invita sea el creador del evento
+        // Verifica que el usuario que invita sea el creador del evento
         if (!evento.getCliente().getEmail().equals(emailCreador)) {
             throw new NoAutorizadoException("No tienes permiso para invitar a este evento");
         }
 
-        // Verificar que no se invite dos veces a la misma persona al mismo evento
+        // Verifica que no se invite dos veces a la misma persona al mismo evento
         if (invitacionRepository.existsByEventoIdAndEmailAsistente(evento.getId(), dto.getEmailAsistente())) {
             throw new ConflictException("Este usuario ya ha sido invitado a este evento");
         }
 
-        // Crear la invitación
+        // Crea la invitación
         Invitacion invitacion = new Invitacion();
         invitacion.setEvento(evento);
         invitacion.setEmailAsistente(dto.getEmailAsistente());
-        invitacion.setEstado(EstadoInvitacion.PENDIENTE); // default estado "pendiente" para nuevas invitaciones
+        invitacion.setEstado(EstadoInvitacion.PENDIENTE); // Estado pendiente por defecto para nuevas invitaciones
 
         Invitacion guardada = invitacionRepository.save(invitacion);
         return entityToDto(guardada);
     }
 
-    // listar todas las invitaciones (solo para usuarios registrados)
+    // Lista todas las invitaciones del usuario registrado
     public List<InvitacionDto> listarMisInvitaciones(String emailAsistente) {
         List<Invitacion> invitaciones = invitacionRepository.findByEmailAsistente(emailAsistente);
         List<InvitacionDto> dtos = new ArrayList<>();
@@ -63,20 +63,20 @@ public class InvitacionService {
     }
 
     public InvitacionDto responderInvitacion(Long eventoId, String emailAsistente, EstadoInvitacion nuevoEstado) {
-        // busca la invitacion con el id del evento y el correo del invitado
+        // Busca la invitación con el id del evento y el correo del invitado
         Optional<Invitacion> opt = invitacionRepository.findByEventoIdAndEmailAsistente(eventoId, emailAsistente);
 
         if (opt.isEmpty()) {
             throw new RecursoNoEncontradoException("Invitación no encontrada");
         }
         Invitacion invitacion = opt.get();
-        // Cambiar estado
+        // Cambia el estado
         invitacion.setEstado(nuevoEstado);
         Invitacion actualizada = invitacionRepository.save(invitacion);
         return entityToDto(actualizada);
     }
 
-    // se rellenan todos las propiedades de InvitacionDto
+    // Rellena todas las propiedades de InvitacionDto
     private InvitacionDto entityToDto(Invitacion i) {
         InvitacionDto dto = new InvitacionDto();
         dto.setId(i.getId());
@@ -92,11 +92,12 @@ public class InvitacionService {
 
     public InvitacionDto responderInvitacionPublica(String datos, EstadoInvitacion nuevoEstado) {
         // "datos" simula los datos cifrados del enlace del email
-        // en una versión real, aquí se descifraría y obtendríamos el id del evento y el email del invitado
+        // En una versión real, aquí se descifraría y se obtendrían el id del evento y
+        // el email del invitado
         Long eventoId = 123L; // valor simulado
         String emailAsistente = "test@email.com"; // valor simulado
 
-        // buscamos la invitación con el evento y el email del invitado
+        // Busca la invitación con el evento y el email del invitado
         Optional<Invitacion> opt = invitacionRepository.findByEventoIdAndEmailAsistente(eventoId, emailAsistente);
 
         if (opt.isEmpty()) {
@@ -105,7 +106,7 @@ public class InvitacionService {
 
         Invitacion invitacion = opt.get();
 
-        // cambiamos el estado a ACEPTADA o RECHAZADA
+        // Cambia el estado a ACEPTADA o RECHAZADA
         invitacion.setEstado(nuevoEstado);
 
         Invitacion actualizada = invitacionRepository.save(invitacion);

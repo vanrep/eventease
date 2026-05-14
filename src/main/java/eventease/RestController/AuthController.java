@@ -19,7 +19,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    // login de usuario
+    // Inicia sesión de usuario
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginRequestDto dto) {
         AuthResponseDto respuesta = authService.login(dto);

@@ -25,44 +25,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        // TODO Auto-generated method stub
-
-        // leer header Authorization
+        // Lee la cabecera Authorization
         String authHeader = request.getHeader("Authorization");
 
-        // si no hay token o no empieza por Bearer, seguir sin autenticar
+        // Si no hay token o no empieza por Bearer, sigue sin autenticar
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        // quitar "Bearer "
+        // Quita "Bearer "
         String token = authHeader.substring(7);
 
-        // sacar email del token
+        // Extrae el email del token
         String email = jwtService.extractEmail(token);
 
-        // si hay email y aún no hay usuario autenticado en el contexto
+        // Si hay email y aún no hay usuario autenticado en el contexto
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
             UserDetails userDetails = usuarioDetailsService.loadUserByUsername(email);
 
-            // validar token
+            // Valida el token
             if (jwtService.isTokenValid(token, userDetails.getUsername())) {
-                // crea el objeto de un usuario autenticado para la petición
+                // Crea el objeto de un usuario autenticado para la petición
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,  //el usuario logueado
-                        null,  // credenciales no hacen falta, el JWT ya ha sido validado
+                        userDetails, // El usuario logueado
+                        null, // Las credenciales no hacen falta, el JWT ya ha sido validado
                         userDetails.getAuthorities()); // los roles y permisos
 
-                // extra info - IP address/ detalles de sesión
+                // Añade información extra como la IP o los detalles de sesión
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                // guardar usuario autenticado en el contexto de esta petición
+                // Guarda el usuario autenticado en el contexto de esta petición
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
         }
-        // continua al siguiente filtro
+        // Continúa al siguiente filtro
         filterChain.doFilter(request, response);
     }
 }

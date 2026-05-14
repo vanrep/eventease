@@ -15,24 +15,19 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 public class UsuarioController {
-    
 
     private final UsuarioService usuarioService;
 
-    // registrar un usuario
+    // Registra un usuario
     @PostMapping("/register")
-    public ResponseEntity<UsuarioDto> register(@Valid @RequestBody UsuarioDto dto){
-        
+    public ResponseEntity<UsuarioDto> register(@Valid @RequestBody UsuarioDto dto) {
+
         UsuarioDto usuarioGuardado = usuarioService.registrarUsuario(dto);
 
         return ResponseEntity
-            // devolvemos la ubicación con el id generado
-            .created(URI.create("/usuarios/" + usuarioGuardado.getId()))
-            .body(usuarioGuardado);
+                // Devuelve la ubicación con el id generado
+                .created(URI.create("/usuarios/" + usuarioGuardado.getId()))
+                .body(usuarioGuardado);
     }
-        
-
-
-
 
 }

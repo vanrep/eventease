@@ -21,7 +21,7 @@ public class InitDatabase implements CommandLineRunner {
         if (usuarioRepository.count() > 0) {
             return;
         }
-        // si no hay usuarios en la BD (en el caso de create-drop), crea algunos de prueba
+        // Si no hay usuarios en la BD, crea algunos de prueba
         crearUsuario("Vanja", "vanja@email.com", Role.ADMIN);
         crearUsuario("Mateo", "mateo@email.com", Role.CLIENTE);
         crearUsuario("Elena", "elena@email.com", Role.CLIENTE);

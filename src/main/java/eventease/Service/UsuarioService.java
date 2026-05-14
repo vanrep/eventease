@@ -17,19 +17,19 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
 
-    // registrar un usuario
+    // Registra un usuario
     public UsuarioDto registrarUsuario(UsuarioDto dto) {
 
-        // comprobar si el email ya está registrado
+        // Comprueba si el email ya está registrado
         if (usuarioRepository.existsByEmail(dto.getEmail())) {
             throw new ConflictException("El email ya está registrado");
         }
-        // crea usuario nuevo
+        // Crea un usuario nuevo
         Usuario u = new Usuario();
-       
-        // el nombre es opcional
+
+        // El nombre es opcional
         if (dto.getNombre() == null || dto.getNombre().isBlank()) {
-            u.setNombre(null);  // guarda null
+            u.setNombre(null); // Guarda null
         } else {
             u.setNombre(dto.getNombre().trim());
         }
@@ -38,14 +38,14 @@ public class UsuarioService {
         // El registro público crea siempre usuarios CLIENTE.
         u.setRol(Role.CLIENTE);
 
-        // guarda usuario
+        // Guarda el usuario
         Usuario guardado = usuarioRepository.save(u);
 
-        // devuelve UsuarioDto (con ID, pero SIN contraseña)
+        // Devuelve un UsuarioDto con ID, pero sin contraseña
         return entityToDto(guardado);
     }
 
-    // entity -> DTO
+    // Convierte la entidad a DTO
     private UsuarioDto entityToDto(Usuario u) {
         UsuarioDto dto = new UsuarioDto();
         dto.setId(u.getId());

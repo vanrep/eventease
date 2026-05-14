@@ -28,7 +28,7 @@ public class UsuarioDetailsService implements UserDetailsService {
         }
 
         Usuario u = opt.get();
-        // devuelve un objeto de tipo UserDetails, un usuario en formato Spring Security
+        // Devuelve un UserDetails con el usuario en formato Spring Security
         return User.withUsername(u.getEmail())
                 .password(u.getPassword())
                 .roles(u.getRol().name())

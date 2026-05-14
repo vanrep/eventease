@@ -30,17 +30,17 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    // Angular port
+    // Puerto de Angular
     @Value("${cors.origin}")
     private String corsOrigin;
 
-    // para poder usar AuthenticationManager para validar contraseñas
+    // Para poder usar AuthenticationManager para validar contraseñas
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
 
-    // para codificar contraseñas y compararlas (entre el login dto y bd)
+    // Para codificar contraseñas y compararlas entre el login DTO y la BD
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -50,26 +50,27 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-                // activar cross-origin resource sharing para permitir peticiones desde otro
-                // puerto (4200 Angular)
+                // Activa CORS para permitir peticiones desde otro puerto
+                // como Angular en el 4200
                 .cors(cors -> {
                 })
 
-                // CSRF desactivado porque no se usan formularios de login de Spring - se usa
+                // CSRF desactivado porque no se usan formularios de login de Spring; se usa
                 // API stateless con JWT
                 .csrf(csrf -> csrf.disable())
 
-                // peticiones independientes, no guarda sesiones
+                // Peticiones independientes, no guarda sesiones
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
-                // rutas públicas vs privadas
+                // Rutas públicas y privadas
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**", "/register", "/invitaciones/public/**", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/auth/**", "/register", "/invitaciones/public/**", "/css/**", "/js/**")
+                        .permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
 
-                // añade filtro JWT antes del filtro normal de Spring
+                // Añade el filtro JWT antes del filtro normal de Spring
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -80,17 +81,17 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // permitir peticiones desde Angular
+        // Permite peticiones desde Angular
         configuration.setAllowedOrigins(List.of(corsOrigin));
 
-        // permitir métodos HTTP
+        // Permite métodos HTTP
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 
-        // permitir todas las cabeceras
+        // Permite todas las cabeceras
         configuration.setAllowedHeaders(List.of("*"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration); // aplicar cors config para todos los endpoints
+        source.registerCorsConfiguration("/**", configuration); // Aplica la configuración CORS a todos los endpoints
 
         return source;
     }

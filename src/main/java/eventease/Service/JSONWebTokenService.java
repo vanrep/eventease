@@ -13,7 +13,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JSONWebTokenService {
 
-    // clave secreta
+    // Clave secreta
     @Value("${jwt.secret}")
     private String secret;
 
@@ -21,35 +21,35 @@ public class JSONWebTokenService {
     @Value("${jwt.expiration}")
     private long expiration;
 
-    // generar token
+    // Genera el token
     public String generateToken(String email, Long userId, String rol) {
         return Jwts.builder()
-                .setSubject(email) // guarda el email dentro del token
-                .claim("userId", userId) // guarda el ID numérico
-                .claim("rol", rol) // guarda el rol del usuario
-                .setIssuedAt(new Date()) // fecha de creación
+                .setSubject(email) // Guarda el email dentro del token
+                .claim("userId", userId) // Guarda el ID numérico
+                .claim("rol", rol) // Guarda el rol del usuario
+                .setIssuedAt(new Date()) // Guarda la fecha de creación
                 .setExpiration(new Date(System.currentTimeMillis() + expiration)) // 1 hora
-                .signWith(getKey()) // firma el token
+                .signWith(getKey()) // Firma el token
                 .compact();
     }
 
-    // extraer email del token
+    // Extrae el email del token
     public String extractEmail(String token) {
         return extractAllClaims(token).getSubject();
     }
 
-    // validar token
+    // Valida el token
     public boolean isTokenValid(String token, String email) {
         final String emailToken = extractEmail(token);
         return (emailToken.equals(email) && !isTokenExpired(token));
     }
 
-    // comprobar si expiró
+    // Comprueba si expiró
     private boolean isTokenExpired(String token) {
         return extractAllClaims(token).getExpiration().before(new Date());
     }
 
-    // leer contenido del token
+    // Lee el contenido del token
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getKey())
@@ -58,7 +58,7 @@ public class JSONWebTokenService {
                 .getBody();
     }
 
-    // generar clave
+    // Genera la clave
     private Key getKey() {
         return Keys.hmacShaKeyFor(secret.getBytes());
     }

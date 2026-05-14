@@ -27,10 +27,12 @@ public class AdminService {
     private final EventoRepository eventoRepository;
     private final InvitacionRepository invitacionRepository;
 
+    // Obtiene todos los usuarios para el panel de administración
     public List<UsuarioDto> obtenerUsuarios() {
         List<Usuario> usuarios = usuarioRepository.findAll();
         List<UsuarioDto> usuariosDto = new ArrayList<>();
 
+        // Convierte cada usuario al DTO que usa el frontend
         for (Usuario usuario : usuarios) {
             UsuarioDto dto = new UsuarioDto();
             dto.setId(usuario.getId());
@@ -43,40 +45,50 @@ public class AdminService {
     }
 
     @Transactional
+    // Elimina un usuario y también sus eventos e invitaciones
     public void eliminarUsuario(Long id) {
         Optional<Usuario> opt = usuarioRepository.findById(id);
         if (opt.isEmpty()) {
             throw new RecursoNoEncontradoException("Usuario no encontrado");
         }
 
+        // Busca los eventos creados por ese usuario
         List<Evento> eventos = eventoRepository.findByClienteId(id);
+
+        // Borra las invitaciones de cada evento antes de borrar los eventos
         for (Evento evento : eventos) {
             invitacionRepository.deleteByEventoId(evento.getId());
         }
+
+        // Borra los eventos del usuario y después el propio usuario
         eventoRepository.deleteAll(eventos);
         usuarioRepository.delete(opt.get());
     }
 
+    // Obtiene todos los eventos para el panel de administración
     public List<EventoDto> listarEventos() {
         List<Evento> eventos = eventoRepository.findAll();
         List<EventoDto> eventosDto = new ArrayList<>();
 
+        // Convierte cada evento al DTO que usa el frontend
         for (Evento evento : eventos) {
             eventosDto.add(entityToDto(evento));
         }
-
         return eventosDto;
     }
 
     @Transactional
+    // Elimina un evento y también sus invitaciones
     public void eliminarEvento(Long id) {
         Evento evento = eventoRepository.findById(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Evento no encontrado"));
 
+        // Borra primero las invitaciones del evento
         invitacionRepository.deleteByEventoId(id);
         eventoRepository.delete(evento);
     }
 
+    // Convierte la entidad de evento a EventoDto
     private EventoDto entityToDto(Evento evento) {
         EventoDto dto = new EventoDto();
         dto.setId(evento.getId());

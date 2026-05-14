@@ -9,12 +9,11 @@ import eventease.Model.Evento;
 
 @Repository
 public interface EventoRepository extends JpaRepository<Evento, Long> {
-    
-    // Obtener todos los eventos creados por un cliente/usuario concreto
+
+    // Obtiene todos los eventos creados por un cliente concreto
     List<Evento> findByClienteId(Long clienteId);
 
-    // Obtener todos los eventos creados por el email de un usuario
+    // Obtiene todos los eventos creados por el email de un usuario
     List<Evento> findByClienteEmail(String email);
-
 
 }

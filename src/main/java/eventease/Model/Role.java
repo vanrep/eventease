@@ -1,6 +1,6 @@
 package eventease.Model;
 
-// Roles de usuarios
+// Roles de usuario
 public enum Role {
     CLIENTE, ADMIN
 }

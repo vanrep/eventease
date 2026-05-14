@@ -21,22 +21,26 @@ public class AdminController {
 
     private final AdminService adminService;
 
+    // Obtiene la lista de usuarios para el panel de administración
     @GetMapping("/usuarios")
     public ResponseEntity<List<UsuarioDto>> obtenerUsuarios() {
         return ResponseEntity.ok(adminService.obtenerUsuarios());
     }
 
+    // Obtiene la lista de eventos para el panel de administración
     @GetMapping("/eventos")
     public ResponseEntity<List<EventoDto>> obtenerEventos() {
         return ResponseEntity.ok(adminService.listarEventos());
     }
 
+    // Elimina un usuario por id desde el panel de administración
     @DeleteMapping("/usuarios/{id}")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         adminService.eliminarUsuario(id);
         return ResponseEntity.noContent().build();
     }
 
+    // Elimina un evento por id desde el panel de administración
     @DeleteMapping("/eventos/{id}")
     public ResponseEntity<Void> eliminarEvento(@PathVariable Long id) {
         adminService.eliminarEvento(id);
